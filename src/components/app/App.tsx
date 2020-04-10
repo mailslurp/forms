@@ -6,11 +6,11 @@ import {Container} from "../common/Container";
 import Step from "../common/Step";
 import HTMLDisplay from "../html-display/HTMLDisplay";
 import FormBuilder from "../form-builder/FormBuilder";
-import {FormField, FormMeta} from "../../lib/types";
+import {FormElements, FormMeta} from "../../lib/types";
 
 function App() {
   const [formMeta, setFormMeta] = useState<FormMeta | undefined>(undefined)
-  const [formFields, setFormFields] = useState<Array<FormField>>([])
+  const [formElements, setFormElements] = useState<FormElements>({})
   return (
     <main className="app">
       <Container>
@@ -46,14 +46,20 @@ function App() {
               <div className="pb-5">
                 <Step title="Add form inputs:" step={2}>
                   <FormBuilder
-                    formFields={formFields}
-                    onChange={ff => setFormFields(ff)}
+                    formElements={formElements}
+                    onChange={ff => {
+                      console.log("form build changer", ff)
+                      setFormElements(ff)
+                    }}
                   />
                 </Step>
               </div>
               <div className="pb-5">
                 <Step title="Include HTML on your website:" step={3}>
-                  <HTMLDisplay formMeta={formMeta} formFields={formFields}/>
+                  <HTMLDisplay
+                    formMeta={formMeta}
+                    formElements={formElements}
+                  />
                 </Step>
               </div>
               <div className="pb-0">

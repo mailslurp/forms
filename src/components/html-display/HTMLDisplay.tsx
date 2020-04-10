@@ -1,12 +1,12 @@
 import React from "react";
 import "./HTMLDisplay.css";
 import Config from "../../config";
-import {FormField, FormMeta} from "../../lib/types";
-import {Forms} from "../../lib/forms";
+import {FormElements, FormMeta} from "../../lib/types";
+import {Elements, Html} from "../../lib/html";
 
 interface HTMLDisplayProps {
   formMeta?: FormMeta,
-  formFields: Array<FormField>
+  formElements: FormElements,
 }
 
 /**
@@ -14,19 +14,20 @@ interface HTMLDisplayProps {
  * @param props
  */
 function getEmbeddableForm(props: HTMLDisplayProps): string {
+  console.log("Get embed", props)
   const lines: string[] = [];
   // need formMeta toProvider and
   if (!props.formMeta || props.formMeta.toProvider.fieldValue === "") {
-    lines.push(Forms.comment("Set options first"))
-  } else if (props.formFields.length === 0) {
-    lines.push(Forms.comment("Great! Now add form fields"))
+    lines.push(Html.comment("Set options first"))
+  } else if (Object.keys(props.formElements).length === 0) {
+    lines.push(Html.comment("Great! Now add form fields"))
   } else {
     lines.push(`<form action="${Config.form.action}" method="${Config.form.method}" enctype="${Config.form.enctype}">`);
     // now add each form element
     const toProvider = props.formMeta.toProvider;
-    lines.push(Forms.hidden(toProvider.fieldName, toProvider.fieldValue))
-    props.formFields.forEach(formField => {
-      lines.push(Forms.indent(formField))
+    lines.push(Html.indent(Elements.hidden(toProvider.fieldName, toProvider.fieldValue).html))
+    Object.values(props.formElements).forEach(formElement => {
+      lines.push(Html.indent(formElement.html))
     })
     lines.push(`</form>`);
   }
@@ -34,14 +35,17 @@ function getEmbeddableForm(props: HTMLDisplayProps): string {
 }
 
 export default function HTMLDisplay(props: HTMLDisplayProps) {
+  console.log("reupdate html display")
   const disabled = !props.formMeta || !props.formMeta.toProvider;
+  const html = getEmbeddableForm(props)
   return (
     <div className="card shadow-sm">
       <div className="card-body">
         <div className="HTMLBuilder">
           <textarea
-            className="form-control text-monospace form-control-sm text-danger" readOnly
-            value={getEmbeddableForm(props)}/>
+            className="form-control text-monospace form-control-sm text-danger"
+            readOnly
+            value={html}/>
         </div>
         <div className="pt-3 text-center">
           <button disabled={disabled} className="btn btn-primary">Copy HTML</button>
